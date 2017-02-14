@@ -1,0 +1,9 @@
+2017-02-07
+	-fixed where Enum values doesn't get saved.
+	-fixed where number fields spit out "not a valid number" when in fact it is valid.
+	-AITargetSelector
+		- added missing target: clear
+	-Added delete button to the item list
+	-Added up/down button to the list editor
+2017-02-08
+	-String trimming before inserting it to List
