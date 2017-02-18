@@ -415,6 +415,7 @@ public class FrameMain extends JFrame {
 				currentConfig.set(key, currentEditor.getTarget().serialize());
 				try {
 					currentConfig.save(currentFile);
+					JOptionPane.showMessageDialog(null, "Changes all saved!");
 				} catch (IOException e1) {
 					Main.LOGGER.log(Level.WARNING, e1.getMessage(), e1);
 					JOptionPane.showMessageDialog(null, "Could not save! See logs for detail.");
