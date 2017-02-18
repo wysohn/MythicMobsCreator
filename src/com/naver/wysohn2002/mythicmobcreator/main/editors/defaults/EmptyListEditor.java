@@ -181,7 +181,7 @@ public class EmptyListEditor extends JPanel {
         if(this.getSelectedIndex() <= 0)
             return;
 
-        swap(this.getSelectedIndex(), this.getSelectedIndex() - 1);
+        swap(list, this.getSelectedIndex(), this.getSelectedIndex() - 1);
 
         updateJList();
     }
@@ -193,13 +193,13 @@ public class EmptyListEditor extends JPanel {
         if(this.getSelectedIndex() > list.size() - 1)
             return;
 
-        swap(this.getSelectedIndex(), this.getSelectedIndex() + 1);
+        swap(list, this.getSelectedIndex(), this.getSelectedIndex() + 1);
 
         updateJList();
     }
 
-    protected void swap(int index1, int index2){
-        String temp = list.get(index1);
+    protected static void swap(List list, int index1, int index2){
+        Object temp = list.get(index1);
         list.set(index1, list.get(index2));
         list.set(index2, temp);
     }

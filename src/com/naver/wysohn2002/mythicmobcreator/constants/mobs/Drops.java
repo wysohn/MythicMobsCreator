@@ -17,6 +17,7 @@
 package com.naver.wysohn2002.mythicmobcreator.constants.mobs;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -226,25 +227,41 @@ public class Drops extends ArrayList<String> implements CustomValue{
                 String amount = secondField.getText();
                 String chance = thirdField.getText();
 
+                if(itemName.length() < 1){
+                    JOptionPane.showMessageDialog(this, "item name is empty!");
+                    firstField.setBackground(Color.red);
+                    return null;
+                }
+
                 if(amount.contains("-") && !NumberUtil.integerRange.matcher(amount).matches()){
                     JOptionPane.showMessageDialog(this, amount+" is not a valid range");
+                    secondField.setBackground(Color.red);
                     return null;
                 }else if(!NumberUtil.integer.matcher(amount).matches()){
                     JOptionPane.showMessageDialog(this, amount+" is not an integer");
+                    secondField.setBackground(Color.red);
                     return null;
                 }
 
                 if (chance.contains("-") && !NumberUtil.rationalRange.matcher(chance).matches()) {
                     JOptionPane.showMessageDialog(this, chance+" is not a valid range");
+                    thirdField.setBackground(Color.red);
                     return null;
                 }else if(!NumberUtil.rational.matcher(chance).matches()){
                     JOptionPane.showMessageDialog(this, chance+" is not a rational");
+                    thirdField.setBackground(Color.red);
                     return null;
                 }
 
                 return itemName + " " + amount + " " + chance;
             case DropTable:
                 String tableName = firstField.getText();
+
+                if(tableName.length() < 1){
+                    JOptionPane.showMessageDialog(this, "dropTable name is empty!");
+                    firstField.setBackground(Color.red);
+                    return null;
+                }
 
                 return tableName;
             case Special:

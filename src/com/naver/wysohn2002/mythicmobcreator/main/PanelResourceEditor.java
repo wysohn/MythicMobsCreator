@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.logging.Level;
 
 import javax.swing.DefaultListModel;
@@ -177,6 +178,7 @@ public class PanelResourceEditor extends JPanel {
 					};
 				}
 
+				tripList(list);
 				model.addElement(new PanelItem(field.getName(), customValue));
 			}else if(field.getType().isEnum()){
 				final Field targetField = field;
@@ -208,7 +210,14 @@ public class PanelResourceEditor extends JPanel {
 		}
 	}
 
-	public ConfigurationSerializable getTarget() {
+	private void tripList(List<String> list) {
+       for(ListIterator<String> iter = list.listIterator(); iter.hasNext();){
+           String str = iter.next();
+           iter.set(str.trim());
+       }
+    }
+
+    public ConfigurationSerializable getTarget() {
 		return target;
 	}
 
