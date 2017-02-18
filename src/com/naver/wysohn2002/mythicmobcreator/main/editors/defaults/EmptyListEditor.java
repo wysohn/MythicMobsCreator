@@ -92,6 +92,8 @@ public class EmptyListEditor extends JPanel {
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setPreferredSize(new Dimension(220, 100));
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+
 
         jList = new JList<String>(list.toArray(new String[list.size()]));
         scrollPane.setViewportView(jList);

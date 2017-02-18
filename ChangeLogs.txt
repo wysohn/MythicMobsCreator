@@ -13,4 +13,8 @@
 		-Goal Selector and Target Selector now can sort itself automatically
 		-Unnecessary textfields will be hidden depends on what user is working on
 	-Skills section of Mobs now have better looking UI
+	-No longer have to press Set button every time for saving single type values(Integer, String, etc.)
+2017-02-18
+	-Folders will be create upon new yml file creation. I wasn't expecting that the folder can not exist in some circumstances
+	-Faster vertical scroll speed
 		

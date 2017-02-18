@@ -318,8 +318,10 @@ public class FrameMain extends JFrame {
 				String input = JOptionPane.showInputDialog("Enter the file name (without .yml)");
 				if(input != null){
 					File folder = new File(Main.instance.getMythicMobsFolderLocation(), currentName);
-					File file = new File(folder, input+".yml");
+					if(!folder.exists())
+					    folder.mkdirs();
 
+					File file = new File(folder, input+".yml");
 					if(file.exists()){
 						JOptionPane.showMessageDialog(null, "This file already exist!");
 						return;
