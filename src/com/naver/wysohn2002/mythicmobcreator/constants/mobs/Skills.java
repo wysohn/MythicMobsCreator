@@ -113,7 +113,7 @@ public class Skills extends ArrayList<String> implements CustomValue{
 
 		@Override
 		public String toString(){
-			return super.name().replaceAll("_", " ").toLowerCase();
+			return super.name().replaceAll("_", "").toLowerCase();
 		}
 	}
 

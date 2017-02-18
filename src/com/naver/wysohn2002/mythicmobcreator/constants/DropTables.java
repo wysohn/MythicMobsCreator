@@ -20,11 +20,20 @@ import java.util.Map;
 
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
+import com.naver.wysohn2002.mythicmobcreator.constants.droptables.Conditions;
+import com.naver.wysohn2002.mythicmobcreator.constants.droptables.TargetOrTriggerConditions;
 import com.naver.wysohn2002.mythicmobcreator.constants.mobs.Drops;
 import com.naver.wysohn2002.mythicmobcreator.util.ClassSerializer;
 
 public class DropTables implements ConfigurationSerializable {
+    public Integer TotalItems;
+    public Integer MinItems;
+    public Integer MaxItems;
+    public Conditions Conditions;
+    public TargetOrTriggerConditions TargetConditions;
+    public TargetOrTriggerConditions TriggerConditions;
     public Drops Drops;
+    public Drops DropsPerLevel;
 
     //////////////////////////////////////////////////////////////////
     public static Mobs deserialize(Map<String, Object> ser){
