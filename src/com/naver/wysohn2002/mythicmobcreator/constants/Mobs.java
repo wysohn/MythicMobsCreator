@@ -21,6 +21,17 @@ import java.util.Map;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.EntityType;
 
+import com.naver.wysohn2002.mythicmobcreator.constants.mobs.AIGoalSelector;
+import com.naver.wysohn2002.mythicmobcreator.constants.mobs.AITargetSelector;
+import com.naver.wysohn2002.mythicmobcreator.constants.mobs.BossBar;
+import com.naver.wysohn2002.mythicmobcreator.constants.mobs.DamageModifiers;
+import com.naver.wysohn2002.mythicmobcreator.constants.mobs.Disguise;
+import com.naver.wysohn2002.mythicmobcreator.constants.mobs.Drops;
+import com.naver.wysohn2002.mythicmobcreator.constants.mobs.Equipment;
+import com.naver.wysohn2002.mythicmobcreator.constants.mobs.LevelModifiers;
+import com.naver.wysohn2002.mythicmobcreator.constants.mobs.Modules;
+import com.naver.wysohn2002.mythicmobcreator.constants.mobs.Options;
+import com.naver.wysohn2002.mythicmobcreator.constants.mobs.Skills;
 import com.naver.wysohn2002.mythicmobcreator.util.ClassSerializer;
 
 public class Mobs implements ConfigurationSerializable{

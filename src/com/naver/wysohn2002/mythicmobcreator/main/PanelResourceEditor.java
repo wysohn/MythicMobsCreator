@@ -16,26 +16,19 @@
  *******************************************************************************/
 package com.naver.wysohn2002.mythicmobcreator.main;
 
-import javax.swing.JPanel;
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 
-import javax.swing.AbstractButton;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
@@ -43,16 +36,14 @@ import javax.swing.SwingConstants;
 
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
-import com.naver.wysohn2002.mythicmobcreator.constants.AIGoalSelector;
-import com.naver.wysohn2002.mythicmobcreator.constants.AITargetSelector;
-import com.naver.wysohn2002.mythicmobcreator.constants.DamageModifiers;
-import com.naver.wysohn2002.mythicmobcreator.constants.Drops;
-import com.naver.wysohn2002.mythicmobcreator.util.Inserter;
+import com.naver.wysohn2002.mythicmobcreator.main.editors.defaults.BooleanEditor;
+import com.naver.wysohn2002.mythicmobcreator.main.editors.defaults.EnumEditor;
+import com.naver.wysohn2002.mythicmobcreator.main.editors.defaults.NumberEditor;
+import com.naver.wysohn2002.mythicmobcreator.main.editors.defaults.SimpleListEditor;
+import com.naver.wysohn2002.mythicmobcreator.main.editors.defaults.StringEditor;
+import com.naver.wysohn2002.mythicmobcreator.main.editors.defaults.WrapEventHandler;
+import com.naver.wysohn2002.mythicmobcreator.util.CustomValue;
 import com.naver.wysohn2002.mythicmobcreator.util.NumberUtil;
-
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import java.awt.GridLayout;
 
 public class PanelResourceEditor extends JPanel {
 	private ConfigurationSerializable target;
@@ -61,13 +52,13 @@ public class PanelResourceEditor extends JPanel {
 	 */
 	public PanelResourceEditor(ConfigurationSerializable target) {
 		this.target = target;
-		
+
 		setLayout(new BorderLayout(0, 0));
-		
+
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		add(scrollPane, BorderLayout.CENTER);
-		
+
 		JPanel panel = new JPanel();
 		scrollPane.setViewportView(panel);
 		panel.setLayout(new GridLayout(0, 1, 5, 5));
@@ -100,9 +91,9 @@ public class PanelResourceEditor extends JPanel {
 				if(subTarget == null)
 					subTarget = (ConfigurationSerializable) field.getType().newInstance();
 				field.set(target, subTarget);
-				
+
 				addItems(subList, subTarget);
-				
+
 				JButton button = new JButton();
 				button.setHorizontalAlignment(SwingConstants.RIGHT);
 				button.setText("Edit");
@@ -115,32 +106,25 @@ public class PanelResourceEditor extends JPanel {
 				});
 				model.addElement(new PanelItem(field.getName(), button));
 			}else if(Boolean.class.isAssignableFrom(field.getType())){
-				JCheckBox checkBox = new JCheckBox();
-				checkBox.setHorizontalAlignment(SwingConstants.RIGHT);
 				Boolean previous = (Boolean) field.get(target);
-				checkBox.setSelected(Boolean.valueOf(previous == null ? false : previous));
 				final Field targetField = field;
-				checkBox.addActionListener(new ActionListener(){
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						AbstractButton abstractButton = (AbstractButton) e.getSource();
-				        boolean selected = abstractButton.getModel().isSelected();
-				        
-				        try {
-							targetField.set(target, selected);
-						} catch (Exception ex){
-							Main.LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-						}
-					}
-				});
-				
-				model.addElement(new PanelItem(field.getName(), checkBox));
+
+				model.addElement(new PanelItem(field.getName(), new BooleanEditor(new WrapEventHandler<Boolean>(){
+                    @Override
+                    public void onSet(Boolean newValue) {
+                        try {
+                            targetField.set(target, newValue);
+                        } catch (Exception ex){
+                            Main.LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+                        }
+                    }
+                }, Boolean.valueOf(previous == null ? false : previous))));
 			}else if(Number.class.isAssignableFrom(field.getType())){
 				final JTextField textField = new JTextField();
 				textField.setPreferredSize(new Dimension(TEXTFIELDWIDTH, TEXTFIELDHEIGHT));
 				textField.setText(String.valueOf(field.get(target)));
 				textField.setHorizontalAlignment(SwingConstants.LEADING);
-				
+
 				JButton button = new JButton();
 				button.setHorizontalAlignment(SwingConstants.RIGHT);
 				button.setText("Set");
@@ -167,128 +151,59 @@ public class PanelResourceEditor extends JPanel {
 						}
 					}
 				});
-				
-				model.addElement(new PanelItem(field.getName(), textField, button));
+
+				model.addElement(new PanelItem(field.getName(), new NumberEditor(new WrapEventHandler<Number>(){
+                    @Override
+                    public void onSet(Number newValue) {
+                        try {
+                            targetField.set(target, newValue);
+                        } catch (Exception ex){
+                            Main.LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+                        }
+                    }
+				}, (Number) field.get(target))));
 			}else if(List.class.isAssignableFrom(field.getType())){
 				List temp = (List) field.get(target);
 				final List list = temp == null ? (List) field.getType().newInstance() : temp;
-				Component[] components;
-				final Inserter inserter;
-				if(Inserter.class.isAssignableFrom(field.getType())){
-					inserter = (Inserter) list;
+				final CustomValue customValue;
+				if(CustomValue.class.isAssignableFrom(field.getType())){
+					customValue = (CustomValue) list;
 				}else{
-					inserter = new Inserter(){
-						@Override
-						public int numParams() {
-							return 1;
-						}
-						
-						@Override
-						public void add(List<String> params) {
-							StringBuilder builder = new StringBuilder();
-							for(String param : params)
-								builder.append(param);
-							list.add(builder.toString());
-						}
-
-						@Override
-						public Class getParamType(int index) {
-							return String.class;
-						}
-
-						@Override
-						public void set(int index, List<String> params) {
-							list.set(index, params.get(0));
-						}
+					customValue = new CustomValue(){
+                        @Override
+                        public JPanel getEditor() {
+                            return new SimpleListEditor(list);
+                        }
 					};
 				}
-				components = new Component[inserter.numParams()];
-				
-				for(int i = 0; i < components.length; i++){
-					Class type = inserter.getParamType(i);
-					if(type.isEnum()){
-						JComboBox<String> comboBox = new JComboBox<String>();
-						for(Object econst : type.getEnumConstants())
-							comboBox.addItem(econst.toString());
-						comboBox.setSelectedIndex(0);
-						components[i] = comboBox;
-					}else{
-						JTextField textField = new JTextField();
-						textField.setPreferredSize(new Dimension(150, 20));
-						components[i] = textField;
-					}
-				}
-				
-				final Field targetField = field;
-				PanelListEditor listEditor = new PanelListEditor(list, new Runnable(){
-					@Override
-					public void run() {
-						try {
-							targetField.set(target, list);
-						} catch (Exception ex){
-							Main.LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-						}
-					}
-				}, new PanelItem(null, components));
-				
-				model.addElement(new PanelItem(field.getName(), listEditor));
+
+				model.addElement(new PanelItem(field.getName(), customValue));
 			}else if(field.getType().isEnum()){
-				JComboBox<String> comboBox = new JComboBox<String>();
-				String previousName = String.valueOf(field.get(target));
-				int selected = 0;
-				for(int i = 0; i < field.getType().getEnumConstants().length; i++){
-					String name = field.getType().getEnumConstants()[i].toString();
-					comboBox.addItem(name);
-					if(previousName.equalsIgnoreCase(name))
-						selected = i;
-				}
-				comboBox.setSelectedIndex(selected);
-				
 				final Field targetField = field;
-				comboBox.addItemListener(new ItemListener(){
-					@Override
-					public void itemStateChanged(ItemEvent e) {
-						int state = e.getStateChange();
-						if (state == ItemEvent.SELECTED) {
-							Class<? extends Enum> cast = (Class<? extends Enum<?>>) targetField.getType();
-							String name = (String) e.getItemSelectable().getSelectedObjects()[0];
-							try {
-								targetField.set(target, Enum.valueOf(cast, name));
-							} catch (Exception ex){
-								Main.LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-							}
-						}
-					}
-				});
-				
-				model.addElement(new PanelItem(field.getName(), comboBox));
+
+				Class<? extends Enum> clazz = (Class<? extends Enum<?>>) targetField.getType();
+				model.addElement(new PanelItem(field.getName(), new EnumEditor(new WrapEventHandler(){
+                    @Override
+                    public void onSet(Object newValue) {
+                        try {
+                            targetField.set(target, newValue);
+                        } catch (Exception ex){
+                            Main.LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+                        }
+                    }
+				}, clazz, (Enum) field.get(target))));
 			}else{
-				final JTextField textField = new JTextField();
-				textField.setPreferredSize(new Dimension(TEXTFIELDWIDTH, TEXTFIELDHEIGHT));
-				textField.setText(String.valueOf(field.get(target)));
-				textField.setHorizontalAlignment(SwingConstants.LEADING);
-				
-				JButton button = new JButton();
-				button.setHorizontalAlignment(SwingConstants.RIGHT);
-				button.setText("Set");
 				final Field targetField = field;
-				button.addActionListener(new ActionListener(){
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						try {
-							if (textField.getText() != null && textField.getText().length() > 0
-									&& !textField.getText().equals("null")){
-								targetField.set(target, textField.getText());
-							}else{
-								targetField.set(target, null);
-							}
-						} catch (Exception ex){
-							Main.LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-						}
-					}
-				});
-				
-				model.addElement(new PanelItem(field.getName(), textField, button));
+				model.addElement(new PanelItem(field.getName(), new StringEditor(new WrapEventHandler<String>(){
+                    @Override
+                    public void onSet(String newValue) {
+                        try {
+                            targetField.set(target, newValue);
+                        } catch (Exception ex){
+                            Main.LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+                        }
+                    }
+				}, (String) field.get(target))));
 			}
 		}
 	}

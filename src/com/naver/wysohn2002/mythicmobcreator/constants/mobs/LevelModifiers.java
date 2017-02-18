@@ -14,49 +14,42 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
-package com.naver.wysohn2002.mythicmobcreator.constants;
+package com.naver.wysohn2002.mythicmobcreator.constants.mobs;
 
 import java.util.Map;
+
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 import com.naver.wysohn2002.mythicmobcreator.util.ClassSerializer;
 
-public class BossBar implements ConfigurationSerializable {
-	public Boolean Enabled;
-	public String Title;
-	public Integer Range;
-	public Color Color;
-	public Style Style;
-	public Boolean CreateFog;
-	public Boolean DarkenSky;
-	public Boolean PlayMusic;
-	
-	//////////////////////////////////////////////////////////////////
-	public static BossBar deserialize(Map<String, Object> ser){
-		try {
-			return (BossBar) ClassSerializer.deserialize(BossBar.class, ser);
-		} catch (Exception e){
-			e.printStackTrace();
-		}
-		
-		return null;
-	}
-	@Override
-	public Map<String, Object> serialize() {
-		try {
-			return ClassSerializer.serialize(this);
-		} catch (Exception e){
-			e.printStackTrace();
-		}
-		
-		return null;
-	}
+public class LevelModifiers implements ConfigurationSerializable{
+    public Number Health;
+    public Number Damage;
+    public Number KnockbackResistance;
+    public Number Power;
+    public Number Armor;
+    public Number MovementSpeed;
+    public Number AttackSpeed;
 
-	public enum Color{
-		PINK, BLUE, RED, GREEN, YELLOW, PURPLE, WHITE;
-	}
-	
-	public enum Style{
-		SOLID, SEGMENTED_6, SEGMENTED_10, SEGMENTED_12, SEGMENTED_20;
-	}
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    public static LevelModifiers deserialize(Map<String, Object> ser) {
+        try {
+            return (LevelModifiers) ClassSerializer.deserialize(LevelModifiers.class, ser);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    @Override
+    public Map<String, Object> serialize() {
+        try {
+            return ClassSerializer.serialize(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 }

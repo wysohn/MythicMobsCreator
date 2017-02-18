@@ -14,94 +14,22 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
-package com.naver.wysohn2002.mythicmobcreator.constants;
+package com.naver.wysohn2002.mythicmobcreator.constants.mobs;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.naver.wysohn2002.mythicmobcreator.util.Inserter;
-import com.naver.wysohn2002.mythicmobcreator.util.NumberUtil;
+import javax.swing.JPanel;
 
-public class Skills extends ArrayList<String> implements Inserter{
-	//Mechanics, String, Targeters, String, Triggers, String, String, Number
-	//mechanic{option=value} @[targeter][{optional}] ~on[trigger] [health_modifier] [chance]
-	
-	public void add(String mech, String mechopt, Targeters tar, String taropt, Triggers trig, String trigopt,
-			String healthModifier, Number chance) {
-		this.add(getString(mech, mechopt, tar, taropt, trig, trigopt, healthModifier, chance));
-	}
-	
-	private String getString(String mech, String mechopt, Targeters tar, String taropt, Triggers trig, String trigopt,
-			String healthModifier, Number chance){
-		if(mechopt != null && mechopt.length() < 1)
-			mechopt = null;
-		
-		if(taropt != null && taropt.length() < 1)
-			taropt = null;
-		
-		if(trigopt != null && trigopt.length() < 1)
-			trigopt = null;
-		
-		if(healthModifier != null && healthModifier.length() < 1)
-			healthModifier = null;
-		
-		return mech + (mechopt == null ? "" : "{"+mechopt+"}") + " "
-				+ tar + (taropt == null ? "" : (tar.isVanilla ? "[" + taropt + "]" : "{" + taropt + "}")) + " "
-				+ trig + (trigopt == null ? "" :(trig.hasParam ? "{" + trigopt + "}" : "")) + " "
-				+ (healthModifier == null ? "" : healthModifier) + " "
-				+ (chance == null ? "" : ""+chance);
-	}
-	
-	@Override
-	public int numParams() {
-		// TODO Auto-generated method stub
-		return 8;
-	}
+import com.naver.wysohn2002.mythicmobcreator.main.editors.defaults.EmptyListEditor;
+import com.naver.wysohn2002.mythicmobcreator.util.CustomValue;
 
-	@Override
-	public void add(List<String> params) {
-		String mech = params.get(0);
-		String mechopt = params.get(1);
-		Targeters tar = Targeters.valueOf(params.get(2).replaceAll("@", ""));
-		String taropt = params.get(3);
-		Triggers trig = Triggers.valueOf(params.get(4).replaceAll("\\~on", ""));
-		String trigopt = params.get(5);
-		String healthModifier = params.get(6);
-		Number chance = NumberUtil.toNumber(params.get(7));
-		
-		add(mech, mechopt, tar, taropt, trig, trigopt, healthModifier, chance);
-	}
+public class Skills extends ArrayList<String> implements CustomValue{
+    @Override
+    public JPanel getEditor() {
+        return new Editor(this);
+    }
 
-	@Override
-	public void set(int index, List<String> params) {
-		String mech = params.get(0);
-		String mechopt = params.get(1);
-		Targeters tar = Targeters.valueOf(params.get(2).replaceAll("@", ""));
-		String taropt = params.get(3);
-		Triggers trig = Triggers.valueOf(params.get(4).replaceAll("\\~on", ""));
-		String trigopt = params.get(5);
-		String healthModifier = params.get(6);
-		Number chance = NumberUtil.toNumber(params.get(7));
-		
-		set(index, getString(mech, mechopt, tar, taropt, trig, trigopt, healthModifier, chance));
-	}
-
-	@Override
-	public Class getParamType(int index) {
-		switch(index){
-		case 0:
-			return Mechanics.class;
-		case 2:
-			return Targeters.class;
-		case 4:
-			return Triggers.class;
-		case 7:
-			return Number.class;
-		default:
-			return String.class;
-		}
-	}
-	
 	public static enum Mechanics{
 		Arrow_Volley,
 		Base_Damage,
@@ -171,13 +99,13 @@ public class Skills extends ArrayList<String> implements Inserter{
 		Push_Button,
 		Toggle_Lever,
 		;
-		
+
 		@Override
 		public String toString(){
 			return super.name().replaceAll("_", "").toLowerCase();
 		}
 	}
-	
+
 	public static enum Targeters{
 		Self,
 		Target,
@@ -231,7 +159,7 @@ public class Skills extends ArrayList<String> implements Inserter{
 			return "@"+this.name();
 		}
 	}
-	
+
 	public static enum Triggers{
 		Combat,
 		Attack,
@@ -265,6 +193,13 @@ public class Skills extends ArrayList<String> implements Inserter{
 			return "~on"+this.name();
 		}
 	}
-	
-	
+
+	private class Editor extends EmptyListEditor{
+
+        public Editor(List<String> targetList) {
+            super(targetList);
+            // TODO Auto-generated constructor stub
+        }
+
+	}
 }

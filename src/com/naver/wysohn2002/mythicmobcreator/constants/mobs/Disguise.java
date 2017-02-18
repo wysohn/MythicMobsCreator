@@ -14,13 +14,38 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
-package com.naver.wysohn2002.mythicmobcreator.util;
+package com.naver.wysohn2002.mythicmobcreator.constants.mobs;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-public interface Inserter {
-	int numParams();
-	void add(List<String> params);
-	void set(int index, List<String> params);
-	Class getParamType(int index);
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
+
+import com.naver.wysohn2002.mythicmobcreator.util.ClassSerializer;
+
+public class Disguise implements ConfigurationSerializable {
+	//////////////////////////////////////////////////////////////////
+	public static Disguise deserialize(Map<String, Object> ser){
+/*		try {
+			return (Disguise) ClassSerializer.deserialize(Disguise.class, ser);
+		} catch (Exception e){
+			e.printStackTrace();
+		}
+		
+		return null;*/
+		
+		return new Disguise();
+	}
+	@Override
+	public Map<String, Object> serialize() {
+/*		try {
+			return ClassSerializer.serialize(this);
+		} catch (Exception e){
+			e.printStackTrace();
+		}
+		
+		return null;*/
+		
+		return new HashMap<String, Object>();
+	}
 }
