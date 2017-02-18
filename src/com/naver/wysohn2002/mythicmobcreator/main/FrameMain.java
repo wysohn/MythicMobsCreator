@@ -84,7 +84,7 @@ public class FrameMain extends JFrame {
 	 * Create the frame.
 	 */
 	public FrameMain() {
-		setMinimumSize(new Dimension(700, 500));
+		setMinimumSize(new Dimension(820, 550));
 		setMaximumSize(new Dimension(1200, 600));
 		getContentPane().setLayout(new BorderLayout(0, 0));
 		setTitle("MythicMobCreator");

@@ -31,6 +31,7 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -87,6 +88,10 @@ public class EmptyListEditor extends JPanel {
 
         scrollPane = new JScrollPane();
         mainPanel.add(scrollPane);
+
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setPreferredSize(new Dimension(220, 100));
 
         jList = new JList<String>(list.toArray(new String[list.size()]));
         scrollPane.setViewportView(jList);
@@ -159,9 +164,9 @@ public class EmptyListEditor extends JPanel {
 
     protected void onRemove(){
         int[] indices = this.jList.getSelectedIndices();
-        int result = JOptionPane.showConfirmDialog(this, "Are you sure to remove ["+indices+"] items?");
+        int result = JOptionPane.showConfirmDialog(this, "Are you sure to remove ["+indices.length+"] items?");
         if(result == JOptionPane.OK_OPTION){
-            for(int i = indices.length - 1; i >= 0; i++){
+            for(int i = indices.length - 1; i >= 0; i--){
                 this.list.remove(indices[i]);
             }
 

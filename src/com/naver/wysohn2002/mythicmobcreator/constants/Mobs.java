@@ -35,7 +35,7 @@ import com.naver.wysohn2002.mythicmobcreator.constants.mobs.Skills;
 import com.naver.wysohn2002.mythicmobcreator.util.ClassSerializer;
 
 public class Mobs implements ConfigurationSerializable{
-	public EntityType Type = EntityType.ZOMBIE;
+	public EntityType Type;
 	public String Display;
 	public Number Health;
 	public Number Damage;

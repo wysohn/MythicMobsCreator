@@ -7,3 +7,9 @@
 	-Added up/down button to the list editor
 2017-02-08
 	-String trimming before inserting it to List
+2017-02-17
+	-Major code structure change(for easier maintenance in future)
+	-More user friendly features
+		-Goal Selector and Target Selector now can sort itself automatically
+		-Unnecessary textfields will be hidden depends on what user is working on
+		
