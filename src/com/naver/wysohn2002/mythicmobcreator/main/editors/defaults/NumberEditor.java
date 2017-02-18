@@ -51,8 +51,12 @@ public class NumberEditor extends JPanel {
             }
 
             private void handle() {
+                if(textField.getText() == null || textField.getText().length() < 1)
+                    return;
+
                 try{
                     setNumber(handle, textField.getText());
+                    textField.setBackground(Color.white);
                 }catch(NumberFormatException ex){
                     textField.setBackground(Color.red);
                 }

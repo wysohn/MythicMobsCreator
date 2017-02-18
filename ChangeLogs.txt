@@ -12,4 +12,5 @@
 	-More user friendly features
 		-Goal Selector and Target Selector now can sort itself automatically
 		-Unnecessary textfields will be hidden depends on what user is working on
+	-Skills section of Mobs now have better looking UI
 		

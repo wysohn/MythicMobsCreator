@@ -276,7 +276,7 @@ public class FrameMain extends JFrame {
 		panel_DropTables = new JPanel();
 		panel_DropTables.setBorder(new EmptyBorder(5, 5, 5, 5));
 		tabbedPane.addTab("DropTables", null, panel_DropTables, null);
-		tabbedPane.setEnabledAt(1, true);
+		tabbedPane.setEnabledAt(1, false);
 		panel_DropTables.setToolTipText("Create or Edit MythicMobs drops");
 		panel_DropTables.setLayout(new BorderLayout(0, 0));
 
