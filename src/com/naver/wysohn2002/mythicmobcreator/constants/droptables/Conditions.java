@@ -17,10 +17,14 @@
 package com.naver.wysohn2002.mythicmobcreator.constants.droptables;
 
 import java.awt.BorderLayout;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 
 import com.naver.wysohn2002.mythicmobcreator.main.editors.defaults.EmptyListEditor;
@@ -36,7 +40,7 @@ public class Conditions extends ArrayList<String> implements CustomValue {
     public static enum GeneralCondition{
         globalscore(true, false),
         altitude(true, false),
-        biome(false, true),
+        biome(true, true),
         crouching(false, true),
         distancefromspawn(false, true),
         entitytype(false, true),
@@ -94,6 +98,10 @@ public class Conditions extends ArrayList<String> implements CustomValue {
     private class Editor extends EmptyListEditor{
         private JPanel panelNorth;
 
+        private JComboBox<GeneralCondition> conditionSelector;
+        private JTextField fieldParam = new JTextField();
+        private JTextField fieldVar = new JTextField();
+
         public Editor(List<String> targetList) {
             super(targetList);
 
@@ -109,7 +117,48 @@ public class Conditions extends ArrayList<String> implements CustomValue {
             panelNorth = new JPanel();
             listPanel.add(panelNorth, BorderLayout.NORTH);
 
+            conditionSelector = new JComboBox<GeneralCondition>(GeneralCondition.values());
+            panelNorth.add(conditionSelector);
 
+            conditionSelector.setEditable(false);
+            conditionSelector.addItemListener(new ItemListener(){
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    fieldParam.setEnabled(false);
+                    fieldVar.setEnabled(false);
+
+                    Object[] selecteds = e.getItemSelectable().getSelectedObjects();
+                    if(selecteds.length < 1)
+                        return;
+
+                    GeneralCondition selected = (GeneralCondition) selecteds[0];
+                    if(selected.hasParam){
+                        fieldParam.setEnabled(true);
+                    }
+                    if(selected.hasVar){
+                        fieldParam.setEnabled(true);
+                    }
+                }
+            });
+
+        }
+
+        @Override
+        protected void onListItemSelected(List<Integer> selectedIndices) {
+            // TODO Auto-generated method stub
+            super.onListItemSelected(selectedIndices);
+        }
+
+        @Override
+        protected void onAdd() {
+            // TODO Auto-generated method stub
+            super.onAdd();
+        }
+
+        @Override
+        protected void onEdit() {
+            // TODO Auto-generated method stub
+            super.onEdit();
         }
 
     }

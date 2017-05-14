@@ -23,23 +23,32 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Villager.Profession;
 
 import com.naver.wysohn2002.mythicmobcreator.util.ClassSerializer;
+import com.naver.wysohn2002.mythicmobcreator.util.Randomizable;
 
-public  class Options implements ConfigurationSerializable{
+public class Options extends Randomizable<Options> implements ConfigurationSerializable{
 	public Boolean AlwaysShowName;
+	@RandomLimit(doubleMin = 0.5, doubleMax = 5.0)
 	public Number AttackSpeed;
 	public Boolean Collidable;
 	public Boolean Despawn;
+	@RandomLimit(doubleMin = 5.0, doubleMax = 30.0)
 	public Number FollowRange;
 	public Boolean Glowing;
+	@RandomLimit(bool = false)
 	public Boolean Invincible;
+	@RandomLimit(doubleMax = 0.5)
 	public Number KnockbackResistance;
+	@RandomLimit(doubleMin = 5.0, doubleMax = 30.0)
 	public Number MaxCombatDistance;
+	@RandomLimit(doubleMax = 0.3)
 	public Number MovementSpeed;
+	@RandomLimit(bool = false)
 	public Boolean NoAI;
+	@RandomLimit(intMax = 10, doubleMax = 10.0)
 	public Number NoDamageTicks;
 	public Boolean NoGravity;
 	public Boolean Persistent;
-	public Boolean PreventItemPickup; 
+	public Boolean PreventItemPickup;
 	public Boolean PreventLeashing;
 	public Boolean PreventMobKillDrops;
 	public Boolean PreventOtherDrops;
@@ -87,12 +96,12 @@ public  class Options implements ConfigurationSerializable{
 	public Profession Profession;
 	public Number Age;
 	public Boolean AgeLock;
-	public Number Color;
+	public Color Color;
 	public Boolean Angry;
 	public Boolean PreventSlimeSplit;
 	public Number Size;
 	public Boolean Tameable;
-	
+
 	//////////////////////////////////////////////////////////////////
 	public static Options deserialize(Map<String, Object> ser){
 		try {
@@ -100,7 +109,7 @@ public  class Options implements ConfigurationSerializable{
 		} catch (Exception e){
 			e.printStackTrace();
 		}
-		
+
 		return null;
 	}
 	@Override
@@ -110,10 +119,10 @@ public  class Options implements ConfigurationSerializable{
 		} catch (Exception e){
 			e.printStackTrace();
 		}
-		
+
 		return null;
 	}
-	
+
 	public static class Pose implements ConfigurationSerializable{
 		public String Head;
 		public String Body;
@@ -121,7 +130,7 @@ public  class Options implements ConfigurationSerializable{
 		public String RightArm;
 		public String LeftLeg;
 		public String RightLeg;
-		
+
 		//////////////////////////////////////////////////////////////////
 		public static Pose deserialize(Map<String, Object> ser){
 			try {
@@ -129,7 +138,7 @@ public  class Options implements ConfigurationSerializable{
 			} catch (Exception e){
 				e.printStackTrace();
 			}
-			
+
 			return null;
 		}
 		@Override
@@ -139,36 +148,45 @@ public  class Options implements ConfigurationSerializable{
 			} catch (Exception e){
 				e.printStackTrace();
 			}
-			
+
 			return null;
 		}
 	}
-	
+
 	public static enum HorseArmor{
 		IRON, GOLD, DIAMOND;
 	}
-	
+
 	public static enum HorseColor{
 		BLACK, BROWN, CHESTNUT, CREAMY, DARK_BROWN, GRAY, WHITE;
 	}
-	
+
 	public static enum HorseStyle{
 		BLACK_DOTS, WHITE, WHITE_DOTS, WHITEFIELD;
 	}
-	
+
 	public static enum HorseType{
 		HORSE, SKELETON_HORSE, ZOMBIE_HORSE;
 	}
-	
+
 	public static enum Ocelot{
 		BLACK_CAT, RED_CAT, SIAMESE_CAT, WILD_OCELOT;
 	}
-	
+
 	public static enum RabbitType{
 		BLACK, BLACK_AND_WHITE, BROWN, GOLD, SALT_AND_PEPPER, THE_KILLER_BUNNY, WHITE;
 	}
-	
+
 	public static enum VillagerType{
 		BLACKSMITH, BUTCHER, FARMER, LIBRARIAN, PRIEST;
 	}
+
+    public static enum Color {
+        WHITE, ORANGE, MAGENTA, LIGHT_BLUE, YELLOW, LIME, PINK, GRAY, SILVER, CYAN, PURPLE, BLUE, BROWN, GREEN, RED, BLACK;
+    }
+
+    @Override
+    public Options createInstance() {
+        return new Options();
+    }
 }

@@ -56,11 +56,13 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
 
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
+import com.naver.wysohn2002.mythicmobcreator.util.Randomizable;
 import com.naver.wysohn2002.mythicmobcreator.util.ReflectionHelper;
+import com.naver.wysohn2002.mythicmobcreator.util.Utf8YamlConfiguration;
 
 public class FrameMain extends JFrame {
 
@@ -70,16 +72,16 @@ public class FrameMain extends JFrame {
 	private FileConfiguration currentConfig;
 
 	private JPanel currentPanel;
-	private JList<String> currentList;
-	private PanelResourceEditor currentEditor;
+	private int currentElementIndex = -1;
+	private JList<String> currentElementList;
+	private PanelResourceEditor currentElementEditor;
 
 	private String currentName;
 
+	private int currerntTypeIndex = -1;
 	private JPanel panel_DropTables;
 	private JPanel panel_Mobs;
 
-	private int currerntMobIndex = -1;
-	private int currerntTypeIndex = -1;
 	/**
 	 * Create the frame.
 	 */
@@ -113,6 +115,39 @@ public class FrameMain extends JFrame {
 			}
 		});
 		mnFile.add(mntmOptions);
+
+		JMenu mnEdit = new JMenu("Edit");
+		menuBar.add(mnEdit);
+
+		JMenuItem mntmRandomize = new JMenuItem("Generate Random");
+		mntmRandomize.addActionListener(new ActionListener() {
+		    @SuppressWarnings("rawtypes")
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(currentConfig == null){
+                    JOptionPane.showMessageDialog(null, "Yml file is not open yet.");
+                    return;
+                }
+
+                if(currentElementEditor == null){
+                    JOptionPane.showMessageDialog(null, "No "+currentName+" has selected yet.");
+                    return;
+                }
+
+                if(currentElementEditor.getTarget() instanceof Randomizable){
+                    ((Randomizable) currentElementEditor.getTarget()).randomize();
+                    JOptionPane.showMessageDialog(null, "Randomized as much as possible!");
+                    currentElementEditor.notifyDataChanged();
+                    invalidate();
+                    repaint();
+                }else{
+                    JOptionPane.showMessageDialog(null,
+                            currentElementEditor.getTarget().getClass().getSimpleName()+" cannot be randomized.");
+                }
+
+		    }
+		});
+		mnEdit.add(mntmRandomize);
 		contentPane = new JPanel();
 		contentPane.setMinimumSize(new Dimension(600, 400));
 		contentPane.setMaximumSize(new Dimension(1000, 600));
@@ -165,24 +200,24 @@ public class FrameMain extends JFrame {
 						scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 						currentPanel.add(scrollPane, BorderLayout.WEST);
 
-						currerntMobIndex = -1;
+						currentElementIndex = -1;
 						final JList<String> list = new PropertiesList();
 						list.addListSelectionListener(new ListSelectionListener(){
 							@Override
 							public void valueChanged(ListSelectionEvent e) {
-								if (currerntMobIndex != -1
-										&& currerntMobIndex != ((JList) e.getSource()).getSelectedIndex()
+								if (currentElementIndex != -1
+										&& currentElementIndex != ((JList) e.getSource()).getSelectedIndex()
 										&& JOptionPane.showConfirmDialog(null,
 												"Unsaved works will be removed. Continue?") != JOptionPane.OK_OPTION) {
-									((JList) e.getSource()).setSelectedIndex(currerntMobIndex);
+									((JList) e.getSource()).setSelectedIndex(currentElementIndex);
 									return;
 								}
 
-								if (currerntMobIndex == ((JList) e.getSource()).getSelectedIndex()) {
+								if (currentElementIndex == ((JList) e.getSource()).getSelectedIndex()) {
 									return;
 								}
 
-								currerntMobIndex = ((JList) e.getSource()).getSelectedIndex();
+								currentElementIndex = ((JList) e.getSource()).getSelectedIndex();
 
 								try {
 									updateResourcePanel();
@@ -223,14 +258,14 @@ public class FrameMain extends JFrame {
 						deleteMenuItem.addActionListener(new ActionListener(){
 							@Override
 							public void actionPerformed(ActionEvent e) {
-								if(currentList == null)
+								if(currentElementList == null)
 									return;
 
-								int selected = currentList.getSelectedIndex();
+								int selected = currentElementList.getSelectedIndex();
 								if(selected < 0)
 									return;
 
-								String selectedItem = currentList.getSelectedValue();
+								String selectedItem = currentElementList.getSelectedValue();
 								int result = JOptionPane.showConfirmDialog(null, "Are you sure to delete "+selectedItem+"?");
 								if(result == JOptionPane.OK_OPTION){
 									try {
@@ -258,7 +293,7 @@ public class FrameMain extends JFrame {
 
 
 						scrollPane.setViewportView(list);
-						currentList = list;
+						currentElementList = list;
 
 						repaint();
 					}
@@ -276,7 +311,7 @@ public class FrameMain extends JFrame {
 		panel_DropTables = new JPanel();
 		panel_DropTables.setBorder(new EmptyBorder(5, 5, 5, 5));
 		tabbedPane.addTab("DropTables", null, panel_DropTables, null);
-		tabbedPane.setEnabledAt(1, false);
+		tabbedPane.setEnabledAt(1, true);
 		panel_DropTables.setToolTipText("Create or Edit MythicMobs drops");
 		panel_DropTables.setLayout(new BorderLayout(0, 0));
 
@@ -334,18 +369,8 @@ public class FrameMain extends JFrame {
 						Main.LOGGER.log(Level.WARNING, e1.getMessage(), e1);
 					}
 
-					currentFile = file;
-					textField_fileName.setText(currentFile.getName());
-					currentConfig = YamlConfiguration.loadConfiguration(currentFile);
-
-					updateList();
-
-					try {
-						updateResourcePanel();
-					} catch (Exception e1) {
-						JOptionPane.showMessageDialog(null, "Error -- "+e1.getMessage());
-						Main.LOGGER.log(Level.SEVERE, e1.getMessage(), e1);
-					}
+					textField_fileName.setText(file.getName());
+					loadCurrentFile(file);
 				}
 			}
 		});
@@ -379,18 +404,8 @@ public class FrameMain extends JFrame {
 
 				int sel = jf.showDialog(null, "Load");
 				if(sel == JFileChooser.APPROVE_OPTION){
-					currentFile = jf.getSelectedFile();
-					textField_fileName.setText(currentFile.getName());
-					currentConfig = YamlConfiguration.loadConfiguration(currentFile);
-
-					updateList();
-
-					try {
-						updateResourcePanel();
-					} catch (Exception e1) {
-						JOptionPane.showMessageDialog(null, "Error -- "+e1.getMessage());
-						Main.LOGGER.log(Level.SEVERE, e1.getMessage(), e1);
-					}
+					textField_fileName.setText(jf.getSelectedFile().getName());
+                    loadCurrentFile(jf.getSelectedFile());
 				}
 			}
 		});
@@ -410,9 +425,9 @@ public class FrameMain extends JFrame {
 					return;
 				}
 
-				String key = currentList.getSelectedValue();
+				String key = currentElementList.getSelectedValue();
 
-				currentConfig.set(key, currentEditor.getTarget().serialize());
+				currentConfig.set(key, currentElementEditor.getTarget().serialize());
 				try {
 					currentConfig.save(currentFile);
 					JOptionPane.showMessageDialog(null, "Changes all saved!");
@@ -443,25 +458,25 @@ public class FrameMain extends JFrame {
 		DefaultListModel<String> listData = new DefaultListModel<String>();
 		for(String key : currentConfig.getKeys(false))
 			listData.addElement(key);
-		currentList.setModel(listData);
+		currentElementList.setModel(listData);
 		if(listData.size() > 0)
-			currentList.setSelectedIndex(0);
+			currentElementList.setSelectedIndex(0);
 	}
 
 	private void updateResourcePanel() throws Exception{
-		int index = currentList.getSelectedIndex();
+		int index = currentElementList.getSelectedIndex();
 		if(index < 0)
 			return;
 
-		String key = currentList.getSelectedValue();
+		String key = currentElementList.getSelectedValue();
 		Object value = currentConfig.get(key);
 		if(!(value instanceof ConfigurationSection))
 			return;
 
-		if(currentEditor != null)
-			currentPanel.remove(currentEditor);
-		currentEditor = new PanelResourceEditor(createObject(currentName, (ConfigurationSection) value));
-		currentPanel.add(currentEditor, BorderLayout.CENTER);
+		if(currentElementEditor != null)
+			currentPanel.remove(currentElementEditor);
+		currentElementEditor = new PanelResourceEditor(createObject(currentName, (ConfigurationSection) value));
+		currentPanel.add(currentElementEditor, BorderLayout.CENTER);
 
 		EventQueue.invokeLater(new Runnable() {
 			@Override
@@ -490,7 +505,27 @@ public class FrameMain extends JFrame {
 		return obj;
 	}
 
-	private class PropertiesList<T> extends JList<T>{
+	private void loadCurrentFile(File file) {
+	    currentFile = file;
+        currentConfig = new Utf8YamlConfiguration();
+        try {
+            currentConfig.load(currentFile);
+        } catch (IOException | InvalidConfigurationException e2) {
+            JOptionPane.showMessageDialog(null, "Could not create file. See logs for more info.");
+            Main.LOGGER.log(Level.WARNING, e2.getMessage(), e2);
+        }
+
+        updateList();
+
+        try {
+            updateResourcePanel();
+        } catch (Exception e1) {
+            JOptionPane.showMessageDialog(null, "Error -- "+e1.getMessage());
+            Main.LOGGER.log(Level.SEVERE, e1.getMessage(), e1);
+        }
+    }
+
+    private class PropertiesList<T> extends JList<T>{
 		@Override
 		public String getToolTipText(MouseEvent event) {
 			Point p = event.getPoint();

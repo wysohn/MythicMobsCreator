@@ -16,6 +16,8 @@
  *******************************************************************************/
 package com.naver.wysohn2002.mythicmobcreator.constants;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
@@ -33,12 +35,34 @@ import com.naver.wysohn2002.mythicmobcreator.constants.mobs.Modules;
 import com.naver.wysohn2002.mythicmobcreator.constants.mobs.Options;
 import com.naver.wysohn2002.mythicmobcreator.constants.mobs.Skills;
 import com.naver.wysohn2002.mythicmobcreator.util.ClassSerializer;
+import com.naver.wysohn2002.mythicmobcreator.util.Randomizable;
 
-public class Mobs implements ConfigurationSerializable{
+public class Mobs extends Randomizable<Mobs> implements ConfigurationSerializable{
+    {
+        customizedRandom = new CustomizedRandom(){
+            @Override
+            public boolean isCustomRandom(Class<?> clazz) {
+                return clazz == EntityType.class;
+            }
+
+            @Override
+            public Object onRandomize(Class<?> clazz) {
+                Class<? extends Enum> cast = (Class<? extends Enum>) clazz;
+                Enum[] enums = cast.getEnumConstants();
+                List<Enum> livingEntities = new ArrayList<>();
+                for(Enum e : enums)
+                    if(((EntityType) e).isAlive())
+                        livingEntities.add(e);
+                return livingEntities.get(random.nextInt(livingEntities.size()));
+            }};
+    }
 	public EntityType Type;
 	public String Display;
+	@RandomLimit(doubleMax = 1024.0)
 	public Number Health;
+	@RandomLimit(doubleMax = 20.0)
 	public Number Damage;
+	@RandomLimit(doubleMax = 20.0)
 	public Number Armor;
 	public BossBar BossBar;
 	public String Faction;
@@ -77,7 +101,10 @@ public class Mobs implements ConfigurationSerializable{
 		return null;
 	}
 
-
+    @Override
+    public Mobs createInstance() {
+        return new Mobs();
+    }
 
 
 }

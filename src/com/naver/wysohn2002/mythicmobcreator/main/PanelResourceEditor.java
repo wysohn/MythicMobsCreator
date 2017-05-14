@@ -48,6 +48,8 @@ import com.naver.wysohn2002.mythicmobcreator.util.NumberUtil;
 
 public class PanelResourceEditor extends JPanel {
 	private ConfigurationSerializable target;
+
+	private JPanel panel;
 	/**
 	 * Create the panel.
 	 */
@@ -61,21 +63,25 @@ public class PanelResourceEditor extends JPanel {
 		scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 		add(scrollPane, BorderLayout.CENTER);
 
-		JPanel panel = new JPanel();
+		panel = new JPanel();
 		scrollPane.setViewportView(panel);
 		panel.setLayout(new GridLayout(0, 1, 5, 5));
 
-		try {
-			DefaultListModel<PanelItem> model = new DefaultListModel();
-			addItems(model);
-			for(int i = 0; i < model.size(); i++){
-				panel.add(model.get(i));
-			}
-		} catch (Exception e){
-			JOptionPane.showMessageDialog(this, e.getMessage());
-			Main.LOGGER.log(Level.SEVERE, e.getMessage(), e);
-		}
+		notifyDataChanged();
 	}
+
+    public void notifyDataChanged() {
+        panel.removeAll();
+        DefaultListModel<PanelItem> model = new DefaultListModel();
+        try {
+            addItems(model);
+        } catch (IllegalArgumentException | IllegalAccessException | SecurityException | InstantiationException e) {
+            e.printStackTrace();
+        }
+        for (int i = 0; i < model.size(); i++) {
+            panel.add(model.get(i));
+        }
+    }
 
 	private void addItems(DefaultListModel<PanelItem> model)
 			throws IllegalArgumentException, IllegalAccessException, SecurityException, InstantiationException {
@@ -84,7 +90,8 @@ public class PanelResourceEditor extends JPanel {
 
 	private static final int TEXTFIELDWIDTH = 300;
 	private static final int TEXTFIELDHEIGHT = 30;
-	private void addItems(DefaultListModel<PanelItem> model, final ConfigurationSerializable target)
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+    private void addItems(DefaultListModel<PanelItem> model, final ConfigurationSerializable target)
 			throws IllegalArgumentException, IllegalAccessException, InstantiationException {
 		for (Field field : target.getClass().getFields()) {
 			if(ConfigurationSerializable.class.isAssignableFrom(field.getType())){
@@ -179,7 +186,9 @@ public class PanelResourceEditor extends JPanel {
 					};
 				}
 
-				tripList(list);
+				field.set(target, list);
+
+				trimList(list);
 				model.addElement(new PanelItem(field.getName(), customValue));
 			}else if(field.getType().isEnum()){
 				final Field targetField = field;
@@ -211,7 +220,7 @@ public class PanelResourceEditor extends JPanel {
 		}
 	}
 
-	private void tripList(List<String> list) {
+	private void trimList(List<String> list) {
        for(ListIterator<String> iter = list.listIterator(); iter.hasNext();){
            String str = iter.next();
            iter.set(str.trim());

@@ -21,11 +21,12 @@ import java.util.Map;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 import com.naver.wysohn2002.mythicmobcreator.util.ClassSerializer;
+import com.naver.wysohn2002.mythicmobcreator.util.Randomizable;
 
-public class Modules implements ConfigurationSerializable {
+public class Modules extends Randomizable<Modules> implements ConfigurationSerializable {
 	public Boolean ThreatTable;
 	public Boolean ImmunityTable;
-	
+
 	//////////////////////////////////////////////////////////////////
 	public static Modules deserialize(Map<String, Object> ser){
 		try {
@@ -33,7 +34,7 @@ public class Modules implements ConfigurationSerializable {
 		} catch (Exception e){
 			e.printStackTrace();
 		}
-		
+
 		return null;
 	}
 	@Override
@@ -43,7 +44,12 @@ public class Modules implements ConfigurationSerializable {
 		} catch (Exception e){
 			e.printStackTrace();
 		}
-		
+
 		return null;
 	}
+    @Override
+    public Modules createInstance() {
+        // TODO Auto-generated method stub
+        return new Modules();
+    }
 }

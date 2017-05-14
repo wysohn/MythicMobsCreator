@@ -19,6 +19,8 @@ package com.naver.wysohn2002.mythicmobcreator.main.editors.defaults;
 import java.awt.BorderLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.Arrays;
+import java.util.Comparator;
 
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
@@ -27,7 +29,14 @@ public class EnumEditor extends JPanel {
     public EnumEditor(final WrapEventHandler<Enum> handle, Class<? extends Enum> clazz, Enum def){
         setLayout(new BorderLayout(5, 5));
 
-        JComboBox<Enum> comboBox = new JComboBox<Enum>(clazz.getEnumConstants());
+        Enum[] enums = clazz.getEnumConstants();
+        Arrays.sort(enums, new Comparator(){
+            @Override
+            public int compare(Object o1, Object o2) {
+                return o1.toString().charAt(0) - o2.toString().charAt(0);
+            }
+        });
+        JComboBox<Enum> comboBox = new JComboBox<Enum>(enums);
         add(comboBox, BorderLayout.CENTER);
 
         comboBox.addItemListener(new ItemListener() {
